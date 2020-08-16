@@ -1,0 +1,27 @@
+version: '3'
+services:
+  redis:
+    image: 'bitnami/redis:latest'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - './data/db/redis:/bitnami:rw'
+    ports:
+      - '6379:6379'
+
+  maxanon:
+    restart: unless-stopped
+    build: .
+    container_name: maxanon
+    ports:
+      - '8000:8000'
+    environment:
+      - "MAXANON_LISTEN=:8000"
+      - "MAXANON_DB=redis"
+      - "MAXANON_DB_URL=redis:6379"
+      - "MAXANON_FILE=/app/data/data.csv"
+    volumes:
+      - './data/dataset:/app/data'
+    depends_on:
+      - redis
+
